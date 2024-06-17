@@ -1,6 +1,6 @@
 # Introduction
 
-toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In creating live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we can continue to conduct for GPT-4o and OpenAI.
+toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In developing live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we can continue to conduct for GPT-4o and OpenAI.
 
 The first part presents results on the MUST-C dataset, showing scores for metrics like BLEU (a measure of translation quality), AL (Average Lagging), AP (Average Proportion), and DAL (Delay And Lagging). It compares the performance of various systems, including the best systems from previous IWSLT (International Workshop on Spoken Language Translation) competitions, models like KIT, wav2vec2+mBART, CUNI-LIT, HW-TSC, and IBWBS, as well as some recent models like wav2vec2+mBART+LA-2, and Anthropic's models gpt-3.5-turbo-0613 and gpt-4-0613.
 
