@@ -1,3 +1,18 @@
+# Introduction
+
+# toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In creating live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we can continue to conduct for GPT-4o and OpenAI.
+
+# The first part presents results on the MUST-C dataset, showing scores for metrics like BLEU (a measure of translation quality), AL (Average Lagging), AP (Average Proportion), and DAL (Delay And Lagging). It compares the performance of various systems, including the best systems from previous IWSLT (International Workshop on Spoken Language Translation) competitions, models like KIT, wav2vec2+mBART, CUNI-LIT, HW-TSC, and IBWBS, as well as some recent models like wav2vec2+mBART+LA-2, and Anthropic's models gpt-3.5-turbo-0613 and gpt-4-0613.
+
+# The next section provides results on the Europarl-ST dataset, showing BLEU scores for various speech-to-text translation systems on English-Spanish and Spanish-English language pairs. It compares the performance of different architectures, such as S2UT (Speech-to-Unit Transformer), wav2vec2.0+mBART, HuBERT, Speech2S, and cascade systems (C1, C2, C3, C4) that combine automatic speech recognition (ASR), machine translation (MT), and text-to-speech (TTS) components.
+
+# The following part evaluates the naturalness of synthesized speech using mean opinion score (MOS) and similarity MOS (SMOS) metrics. It compares different approaches, including S2UT with original and normalized units, S2UT with TTS components, Direct S2ST, TextlessS2ST, TranSpeech, StyleS2ST, and commercial systems like VALL-E X and Speech2S.
+
+# The Libri section reports character error rate (CER), word error rate (WER), and speaker classification accuracy for different speech synthesis and recognition models, including SoundStream, AudioLM, GSLM, wav2vec 2.0 CTC, Transformer, and commercial systems like Whisper and StreamSpeech.
+
+# Finally, the Inference part compares the real-time factor (RTF, a measure of computational efficiency) of various models on text-to-text translation (T2TT) and speech-to-text translation (S2TT) tasks, with and without quantization and system message prompts. It includes models like TRANSLLAMA, GPT-4, EDATT, NAIST IWSLT 2023, UnitY, StreamSpeech, S2UT, TranSpeech, and others.
+
+
 # evals
 
 ## MUST-C 
