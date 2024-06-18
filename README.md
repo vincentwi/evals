@@ -1,7 +1,7 @@
 # Introduction
 
 toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In developing live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we continue to conduct for finding the best Simultaneous Speech to Speech Translation (Simul-S2ST) models.
-# Evaluation Metrics
+# Evaluation Metrics & Strategies
 ### Average Lagging (AL)
 Average Lagging (AL) measures the average delay between the source inputs and the corresponding outputs in speech translation systems. It's used to assess the responsiveness of the system. AL calculates the average lag by comparing the expected position of each output, based on an even distribution of outputs over inputs, to its actual timing. A negative value indicates that, on average, outputs are generated before their corresponding inputs.
 
