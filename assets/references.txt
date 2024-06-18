@@ -1,0 +1,38 @@
+CUNI-KIT System for Simultaneous Track at IWSLT 2023 https://aclanthology.org/2023.iwslt-1.37.pdf 4/23   
+KIT’s Multilingual Speech Translation System for IWSLT 2023 https://aclanthology.org/2023.iwslt-1.6.pdf 4/23         
+Unsupervised Transfer Learning in Multilingual Neural Machine Translation with Cross-Lingual Word Embeddings https://arxiv.org/pdf/2103.06689 3/11/21    
+CUNI-KIT System for Simultaneous Speech Translation Task at IWSLT 2022 https://arxiv.org/pdf/2204.06028 05/11/22    
+JOINT PRE-TRAINING WITH SPEECH AND BILINGUAL TEXT FOR DIRECT SPEECH TO SPEECH TRANSLATION https://arxiv.org/pdf/2210.17027 10/31/22    
+UWSpeech: Speech to Speech Translation for Unwritten Languages https://arxiv.org/pdf/2006.07926 12/17/20  
+Speak Foreign Languages with Your Own Voice: Cross-Lingual Neural Codec Language Modeling https://arxiv.org/pdf/2303.03926 03/07/23    
+AudioLM: a Language Modeling Approach to Audio Generation https://arxiv.org/pdf/2209.03143  07/26/23   
+UnitY: Two-pass Direct Speech-to-speech Translation with Discrete Units https://aclanthology.org/2023.acl-long.872.pdf     
+SONAR: Sentence-Level Multimodal and Language-Agnostic Representations https://scontent-sjc3-1.xx.fbcdn.net/v/t39.2365-6/385083099_996183704796913_6712193664436461927_n.pdf?_nc_cat=111&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=sei-VtuV4-8Q7kNvgFQipdQ&_nc_ht=scontent-sjc3-1.xx&oh=00_AYDktq08o5dq96vTWB3ztz80P7MVI6ffgehKzXjZhvEMRA&oe=66686EFC  
+Textless Speech-to-Speech Translation on Real Data https://arxiv.org/pdf/2112.08352 05/04/22    
+Direct Speech-to-Speech Translation With Discrete Units https://arxiv.org/pdf/2107.05604 03/21/22    
+Towards Real-World Streaming Speech Translation for Code-Switched Speech https://arxiv.org/pdf/2310.12648 10/23/23  
+CODE-SWITCHING WITHOUT SWITCHING: LANGUAGE AGNOSTIC END-TO-END SPEECH TRANSLATION https://arxiv.org/pdf/2210.01512 11/09/22 
+Language-agnostic Code-Switching in Sequence-To-Sequence Speech Recognition https://arxiv.org/pdf/2210.08992 07/03/23  
+CONVOIFILTER: A CASE STUDY OF DOING COCKTAIL PARTY SPEECH RECOGNITION https://arxiv.org/pdf/2308.11380 04/07/24  
+STACL: Simultaneous Translation with Implicit Anticipation and Controllable Latency using Prefix-to-Prefix Framework https://aclanthology.org/P19-1289.pdf 04/19 newstest-2013 (dev)  
+Tagged End-to-End Simultaneous Speech Translation Training using Simultaneous Interpretation Data https://aclanthology.org/2023.iwslt-1.34.pdf 04/23   
+StyleS2ST: Zero-shot Style Transfer for Direct Speech-to-speech Translation https://arxiv.org/pdf/2305.17732 07/25/23   
+The HW-TSC’s Simultaneous Speech-to-Text Translation system for IWSLT 2023 evaluation https://aclanthology.org/2023.iwslt-1.35.pdf 04/23  
+StreamSpeech: Simultaneous Speech-to-Speech Translation with Multi-task Learning https://arxiv.org/pdf/2406.03049 06/05/24 
+Decoder-only Streaming Transformer for Simultaneous Translation https://arxiv.org/pdf/2406.03878 06/06/24   
+Self-Modifying State Modeling for Simultaneous Machine Translation https://arxiv.org/pdf/2406.02237 06/04/24     
+Simul-LLM: A Framework for Exploring High-Quality Simultaneous Translation with Large Language Models https://arxiv.org/pdf/2312.04691 06/05/24       
+Simultaneous Masking, Not Prompting Optimization: A Paradigm Shift in Fine-tuning LLMs for Simultaneous Translation https://arxiv.org/pdf/2405.10443 05/15/24 IWSLT 2017 dataset  
+SiLLM: Large Language Models for Simultaneous Machine Translation https://arxiv.org/pdf/2402.13036 02/20/24 https://github.com/ictnlp/SiLLM  
+GLANCING FUTURE FOR SIMULTANEOUS MACHINE TRANSLATION https://arxiv.org/pdf/2309.06179 09/12/23  
+LANGUAGE MODEL IS A BRANCH PREDICTOR FOR SIMULTANEOUS MACHINE TRANSLATION https://arxiv.org/pdf/2312.14488 12/23/23  
+R-BI: Regularized Batched Inputs enhance Incremental Decoding Framework for Low-Latency Simultaneous Speech Translation https://arxiv.org/pdf/2401.05700 01/11/24  
+SimulTron: On-Device Simultaneous Speech to Speech Translation https://arxiv.org/pdf/2406.02133 06/04/24 
+TRANSPEECH: SPEECH-TO-SPEECH TRANSLATION WITH BILATERAL PERTURBATION https://arxiv.org/pdf/2205.12523 03/02/23      
+Improving Cascaded Unsupervised Speech Translation with Denoising Back-translation https://arxiv.org/pdf/2305.07455 05/12/23   
+Learning When to Speak: Latency and Quality Trade-offs for Simultaneous Speech-to-Speech Translation with Offline Models https://arxiv.org/pdf/2306.01201 06/01/23   
+Simple and Effective Unsupervised Speech Translation https://arxiv.org/pdf/2210.10191 10/18/22  
+Recent Advances in End-to-End Simultaneous Speech Translation https://arxiv.org/pdf/2406.00497 06/01/24  
+Conversational SIMULMT: Efficient Simultaneous Translation with Large Language Models https://arxiv.org/pdf/2402.10552 02/16/24  
+Simultaneous Machine Translation with Large Language Models https://arxiv.org/pdf/2309.06706 02/15/24  
+TRANSLLAMA: LLM-based Simultaneous Translation System https://arxiv.org/pdf/2402.04636 02/07/24     MUST-C
