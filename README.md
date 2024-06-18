@@ -5,7 +5,7 @@ toby is a multilingual hiring platform that enables companies to find, hire, and
 ### Average Lagging (AL)
 Average Lagging (AL) measures the average delay between the source inputs and the corresponding outputs in speech translation systems. It's used to assess the responsiveness of the system. AL calculates the average lag by comparing the expected position of each output, based on an even distribution of outputs over inputs, to its actual timing. A negative value indicates that, on average, outputs are generated before their corresponding inputs.
 
-$AL = -\frac{1}{\tau} \sum_{i=1}^{\tau} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$
+$$AL = -\frac{1}{\tau} \sum_{i=1}^{\tau} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$$
 
 Where:
 - $\tau = \arg\min_i (t_i = |X|)$: The smallest index $i$ for which the timing of the $i$-th output aligns with the end of the input sequence.
@@ -18,7 +18,7 @@ Where:
 ### Differentiable Average Lagging (DAL)
 Differentiable Average Lagging (DAL) is a variant of the Average Lagging that is differentiable, modifying the calculation of lag by ensuring each subsequent output is considered after a certain minimum delay, allowing for gradient-based optimization.
 
-$DAL = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$
+$$DAL = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$$
 
 Where:
 - $t_i = \max(t_{i-1}, t_i + 1 - \frac{1}{\frac{|S|}{|X|}})$ for $i > 1$, and $t_1$ for $i = 1$.
@@ -28,13 +28,13 @@ Where:
 ### Average Proportion (AP)
 Average Proportion (AP) assesses the proportion of generated speech segments relative to the total duration of the source speech, indicating the compression or expansion of speech in the generated output.
 
-$AP = \frac{1}{|X||S|} \sum\limits_{i=1}^{|S|} t_i$
+$$AP = \frac{1}{|X||S|} \sum\limits_{i=1}^{|S|} t_i$$
 
 
 ### Average Target Delay (ATD)
 Average Target Delay (ATD) computes the difference between the actual and the expected timing of outputs, indicating how much each output deviates from its ideal timing based on the input.
 
-$ATD = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} (t_i - \xi_{\text{seg},i})$
+$$ATD = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} (t_i - \xi_{\text{seg},i})$$
 
 Where:
 - $\xi_{\text{seg},i}$: The timing of the segment corresponding to the $i$-th output.
@@ -43,7 +43,7 @@ Where:
 ### Length-Adaptive Average Lagging (LAAL)
 Length-Adaptive Average Lagging (LAAL) is a refinement of AL that adjusts for the overall generation speed by considering both the source length and the predicted target length, accommodating variations in speech generation speed.
 
-$LAAL = \frac{1}{\tau} \sum\limits_{i=1}^{\tau} \left(t_i - \frac{i-1}{\max(|S|, |S^*|)/|X|}\right)$
+$$LAAL = \frac{1}{\tau} \sum\limits_{i=1}^{\tau} \left(t_i - \frac{i-1}{\max(|S|, |S^*|)/|X|}\right)$$
 
 Where:
 - $S^*$: Generated target speech.
@@ -53,8 +53,8 @@ Where:
 
 Hallucination in this context refers to the generation of tokens in the output $\hat{y}_i$ ​i​ that do not correspond to or align with any source token in the input. It's an important metric for evaluating the fidelity of a translation or text generation model.
 
-$H(i, h) = \mathbf{1}[{\{ (j, i) \in h \} = \emptyset}]$
-$HR(x, \hat{y}, h) = \frac{1}{|\hat{y}|} \sum\limits_{i=1}^{|\hat{y}|} H(i, h)$
+$$H(i, h) = \mathbf{1}[{\{ (j, i) \in h \} = \emptyset}]$$
+$$HR(x, \hat{y}, h) = \frac{1}{|\hat{y}|} \sum\limits_{i=1}^{|\hat{y}|} H(i, h)$$
 
 Where:
 -   $i$ indexes the token in the predicted sequence y^\hat{y}y^​.
@@ -81,11 +81,11 @@ Where:
 
 ### PN Score (Proper Noun Score)
 
-The PN Score is a novel metric designed to focus specifically on the accuracy of proper noun transcription in speech recognition. This metric evaluates the lexical similarity of proper noun phrases in the output compared to the reference, using string similarity metrics.  As an example, both Nicholas Cage and Ridiculous
-Cage would be penalized with a `WER = 0.5` given the correct
+The PN Score is a novel metric designed to focus specifically on the accuracy of proper noun transcription in speech recognition. This metric evaluates the lexical similarity of proper noun phrases in the output compared to the reference, using string similarity metrics.  As an example, both `Nicholas Cage` and `Ridiculous
+Cage` would be penalized with a `WER = 0.5` given the correct
 spelling Nicolas Cage, where `Nicholas` is clearly superior.
 
-$PN\_score = \max_{n, m} \sum\limits_{k=0}^{n} \text{lex\\_dist}(\text{aligned}[k])$ 
+$$PN\_{score} = \max_{n, m} \sum\limits_{k=0}^{n} \text{lex\\_dist}(\text{aligned}[k])$$
 
 Where:
 
@@ -99,7 +99,7 @@ The PN Score aggregates the similarity scores of aligned proper nouns, maximizin
 
 BLEU is a widely-used metric for measuring the quality of machine-translated text against a set of reference translations. BLEU calculates the geometric mean of the n-gram precision scores, adjusted by a brevity penalty to discourage overly short translations. Higher BLEU scores indicate translations that are closer to their human-provided references, suggesting higher translation quality.
 
-$\text{BLEU} = \text{BP} \cdot \exp\left(\sum\limits_{n=1}^{N} w_n \log p_n\right)$ 
+$$\text{BLEU} = \text{BP} \cdot \exp\left(\sum\limits_{n=1}^{N} w_n \log p_n\right)$$
 
 Where
 
@@ -113,9 +113,9 @@ Where
 
 Real-time Factor (RTF) is a measure of the speed of a speech processing system. It compares the computation time to the length of the audio processed. An RTF greater than 1 means the system is slower than real-time, which might be problematic for live or streaming applications. An RTF less than 1 indicates the system can process audio faster than it is played, suitable for real-time applications.
 
-$RTF = \frac{\text{Total Computation Time}}{\text{Length of Audio}}$ 
+$$RTF = \frac{\text{Total Computation Time}}{\text{Length of Audio}}$$
 
-**Explanation:**
+Where:
 
 -   **Total Computation Time**: The total time taken by the system to complete the processing of the audio.
 -   **Length of Audio**: The total duration of the audio input in real-time seconds. 
@@ -124,14 +124,23 @@ $RTF = \frac{\text{Total Computation Time}}{\text{Length of Audio}}$
 
 The Hold-n strategy ensures that the best hypothesis is selected from the beam search of the c-th chunk, and output is delayed until a better decision can be made about the translation's correctness up to n chunks.
 
+$$
+\text{prefix}(W^c_{\text{best}}) = W^{\text{0:max}(0, |W|-n)}
+$$
+
+
+Where:
+-   W^c_{\text{best}} is the best hypothesis in the beam search of the c-th chunk.
+-   If the hypothesis has only n or fewer tokens, an empty string is returned.
+-   This strategy avoids premature commitment to tokens that might later be contradicted by subsequent chunks.
+
+### LA-n Strategy
+Local Agreement (LA-n) enhances the Hold-n strategy by waiting to output tokens until n chunks are processed, then outputs the longest common prefix of the best hypotheses of these n consecutive chunks.
 
 $$
-\text{prefix}(W^c_{\text{best}}) = 
-\begin{cases} 
-\emptyset & \text{if } c < n, \\
-\text{LCP}(W^c_{\text{best-n+1}}, \ldots, W^c_{\text{best}}) & \text{otherwise}.
-\end{cases}
+\text{prefix}(W^c_{\text{best}}) =  \text{LCP}(W_{\text{best}}^{c-n+1}, \ldots, W_{\text{best}}^c)
 $$
+ 
 Where:
 -   $W^c_{\text{best}}$ is the best hypothesis in the beam search of the c-th chunk.
 -   $\text{LCP}$ is the longest common prefix.
@@ -143,17 +152,54 @@ The SP-n (Shared Prefix-n) strategy generalizes the Hold-n strategy by consideri
 
 
 $$
-\text{prefix}(W^c_{\text{all}}) = \begin{cases} 
-\emptyset & \text{if } c < n, \\
-\text{LCP}(W^{c-n+1}_{\text{beam 1..B}}, \ldots, W^c_{\text{beam 1..B}}) & \text{otherwise}.
-\end{cases}
+\text{prefix}(W^c_{\text{all}}) = \text{LCP}(W_{\text{beam 1..B}}^{c-n+1}, \ldots, W_{\text{beam 1..B}}^c)
 $$
 
-Where
-
+Where:
 -   $W^c_{\text{all}}$​ represents all hypotheses across all beams of the c-th chunk.
 -   $B$ is the beam size.
 -   The function considers all beam hypotheses from chunk $c−n+1$ to $c$. 
+
+
+# Figures 
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure1.png" alt="Figure 1" width="100%"/><br>Figure 1: SP, Hold-n and LA Strategies plotted with AL and BLEU</td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure2.png" alt="Figure 2" width="100%"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure3.png" alt="Figure 3" width="100%"/></td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure4.png" alt="Figure 4" width="100%"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure5.png" alt="Figure 5" width="100%"/></td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure9.png" alt="Figure 9" width="100%"/><br>Figure 9: SP, Hold-n and LA Strategies plotted with AL and BLEU</td>
+  </tr>
+  
+</table>
+
+![Figure 6-8](https://raw.githubusercontent.com/vincentwi/evals/main/assets/fig68.png)
+
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure10.png" alt="Figure 10" width="100%"/></td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure11.png" alt="Figure 11" width="100%"/><br>Figure 11: Hidden Markov Transformer (HMT), Monotonic Multihead Attention (MMA) and Wait-k Strategies plotted with AL and BLEU</td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure12.png" alt="Figure 12" width="100%"/></td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure13.png" alt="Figure 13" width="100%"/><br>Figure 13: Monotonic Multihead Attention (MMA), LM (GPT2) and Wait-k Strategies plotted with AL and BLEU</td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure14.png" alt="Figure 14" width="100%"/></td>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure15.png" alt="Figure 15" width="100%"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/vincentwi/evals/main/assets/figure16.png" alt="Figure 16" width="100%"/><br>Figure 16: Positive relationship between ATD increases and BLEU scores for different fine-tuning strategies</td>
+    <!-- The cell below is left empty if there is no Figure 17 -->
+    <td></td>
+  </tr>
+</table>
+
 
 # Datasets
 
@@ -240,8 +286,8 @@ Where
 | gpt-3.5-turbo-0613        |    2.08 | 2574.98 |   **0.35** | 2477.55 |
 | gpt-4-0613                |   21.82 | 1998.63 |   0.94 | 2314.27 |
 |:--------------------------|--------:|--------:|-------:|--------:|
-| toby (Ours)               |   **50.1** | 2352.19 |   _0.81  | _3470.2 |
-
+| toby (Ours)               |   **50.1** | 2352.19 |   0.81  | 3470.2 |
+.
 
 ## Europarl-ST
 | System            | Pre-trained Model     | Parameters   | en-es Europarl-ST (dev) BLEU↑    |   en-es Europarl-ST (test) | es-en Europarl-ST (dev)   |   es-en Europarl-ST (test) |
@@ -263,7 +309,7 @@ Where
 | S2UT+tf TTS       | HuBERT + Kmeans + CTC | nan          | 19.2                      |                       21.7 | 19.8                      |                       21.7 |
 | S2UT+T2U          | HuBERT + Kmeans + CTC | nan          | 19.4                      |                       21.8 | 19.7                      |                       21.8 |
 |:--------------------------|--------:|--------:|-------:|--------:|--------:|--------:|
-| toby (Ours)               |   cascade | nan |   _  | _ | _ | _ |
+| toby (Ours)               |   nan | nan |   33.1  | 28.7 | 29.4 | 26.6 |
 
 ### Naturalness
 | Method                     |   MOS↑ |   SMOS↑ |
@@ -297,7 +343,7 @@ Where
 | Translatotron 2                | 3.98                 | 3.36 |
 | Translatotron 2 + data augmentation            | 3.79                 | nan |
 |:--------------------------|--------:|--------:|
-| toby (Ours)               |   _ | _ | 
+| toby (Ours)               |   4.1 | 3.83| 
 
 
 |    | Method       |   SNR↑ |
@@ -306,7 +352,7 @@ Where
 |  1 | TextlessS2ST | 47.22 |
 |  2 | TranSpeech   | 46.56 |
 |:------------------|--------:|
-| toby (Ours)       | _ |
+| toby (Ours)       | nan |
 
 
 ## Libri 
@@ -337,6 +383,8 @@ Where
 |:--------------------------|--------:|--------:|-------:|--------:|--------:|--------:|
 | toby (Ours)               |   _  | 3.6 | _ |
 
+![toby-wer](https://raw.githubusercontent.com/vincentwi/evals/main/assets/al-wer.jpg)
+![toby-pna](https://raw.githubusercontent.com/vincentwi/evals/main/assets/al-pna.jpg)
 
 ## Inference
 | model               | mode | quantization | system message | size, bn param. | RTF↓ |
@@ -349,6 +397,9 @@ Where
 | GPT-4               | S2TT | nan      | yes            | nan         | 4.8 |
 | EDATT | S2TT | 16-bit       | nan            | 1.04            | 0.7 |
 | NAIST IWSLT 2023  | S2TT | 16-bit       | nan            | 0.176           | 1.4 |
+| Wait-k | S2TT | nan | nan | .80 | 1.91 | 
+| HMT | S2TT | nan | nan | .80 | 1 | 
+| DST | S2TT | nan | nan | .67 | 1.39 | 
 | UnitY | S2TT | nan | nan | 0.95 | 1.19 | 
 | StreamSpeech | S2TT | nan | nan | 0.7 | 4.5 | 
 | S2UT                              | S2TT   | L11 km1000     |     nan             |              0.65 |   1    |
