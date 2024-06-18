@@ -1,25 +1,167 @@
 # Introduction
 
-toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In developing live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we can continue to conduct for GPT-4o and OpenAI.
-
-The first part presents results on the MUST-C dataset, showing scores for metrics like BLEU (a measure of translation quality), AL (Average Lagging), AP (Average Proportion), and DAL (Delay And Lagging). It compares the performance of various systems, including the best systems from previous IWSLT (International Workshop on Spoken Language Translation) competitions, models like KIT, wav2vec2+mBART, CUNI-LIT, HW-TSC, and IBWBS, as well as some recent models like wav2vec2+mBART+LA-2, and Anthropic's models gpt-3.5-turbo-0613 and gpt-4-0613.
-
-The next section provides results on the Europarl-ST dataset, showing BLEU scores for various speech-to-text translation systems on English-Spanish and Spanish-English language pairs. It compares the performance of different architectures, such as S2UT (Speech-to-Unit Transformer), wav2vec2.0+mBART, HuBERT, Speech2S, and cascade systems (C1, C2, C3, C4) that combine automatic speech recognition (ASR), machine translation (MT), and text-to-speech (TTS) components.
-
-The following part evaluates the naturalness of synthesized speech using mean opinion score (MOS) and similarity MOS (SMOS) metrics. It compares different approaches, including S2UT with original and normalized units, S2UT with TTS components, Direct S2ST, TextlessS2ST, TranSpeech, StyleS2ST, and commercial systems like VALL-E X and Speech2S.
-
-The Libri section reports character error rate (CER), word error rate (WER), and speaker classification accuracy for different speech synthesis and recognition models, including SoundStream, AudioLM, GSLM, wav2vec 2.0 CTC, Transformer, and commercial systems like Whisper and StreamSpeech.
-
-Finally, the Inference part compares the real-time factor (RTF, a measure of computational efficiency) of various models on text-to-text translation (T2TT) and speech-to-text translation (S2TT) tasks, with and without quantization and system message prompts. It includes models like TRANSLLAMA, GPT-4, EDATT, NAIST IWSLT 2023, UnitY, StreamSpeech, S2UT, TranSpeech, and others.
-
-
+toby is a multilingual hiring platform that enables companies to find, hire, and work with global talent. In developing live translation software, we have evaluated various speech-to-text translation and text-to-speech synthesis models to understand the current state of the technology. Below are the results, evaluated on different datasets and metrics, and representative of the type of evaluations that we continue to conduct for finding the best Simultaneous Speech to Speech Translation (Simul-S2ST) models.
 # evals
+### Average Lagging (AL)
+Average Lagging (AL) measures the average delay between the source inputs and the corresponding outputs in speech translation systems. It's used to assess the responsiveness of the system. AL calculates the average lag by comparing the expected position of each output, based on an even distribution of outputs over inputs, to its actual timing. A negative value indicates that, on average, outputs are generated before their corresponding inputs.
+
+$AL = -\frac{1}{\tau} \sum_{i=1}^{\tau} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$
+
+Where:
+- $\tau = \arg\min_i (t_i = |X|)$: The smallest index $i$ for which the timing of the $i$-th output aligns with the end of the input sequence.
+- $t_i$: The timing of the $i$-th output.
+- $|S|$: The total number of segments in the source.
+- $|X|$: The total number of segments in the target.
+
+
+
+### Differentiable Average Lagging (DAL)
+Differentiable Average Lagging (DAL) is a variant of the Average Lagging that is differentiable, modifying the calculation of lag by ensuring each subsequent output is considered after a certain minimum delay, allowing for gradient-based optimization.
+
+$DAL = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} \left(t_i - \frac{i-1}{\frac{|S|}{|X|}}\right)$
+
+Where:
+- $t_i = \max(t_{i-1}, t_i + 1 - \frac{1}{\frac{|S|}{|X|}})$ for $i > 1$, and $t_1$ for $i = 1$.
+
+
+
+### Average Proportion (AP)
+Average Proportion (AP) assesses the proportion of generated speech segments relative to the total duration of the source speech, indicating the compression or expansion of speech in the generated output.
+
+$AP = \frac{1}{|X||S|} \sum\limits_{i=1}^{|S|} t_i$
+
+
+### Average Target Delay (ATD)
+Average Target Delay (ATD) computes the difference between the actual and the expected timing of outputs, indicating how much each output deviates from its ideal timing based on the input.
+
+$ATD = \frac{1}{|S|} \sum\limits_{i=1}^{|S|} (t_i - \xi_{\text{seg},i})$
+
+Where:
+- $\xi_{\text{seg},i}$: The timing of the segment corresponding to the $i$-th output.
+
+
+### Length-Adaptive Average Lagging (LAAL)
+Length-Adaptive Average Lagging (LAAL) is a refinement of AL that adjusts for the overall generation speed by considering both the source length and the predicted target length, accommodating variations in speech generation speed.
+
+$LAAL = \frac{1}{\tau} \sum\limits_{i=1}^{\tau} \left(t_i - \frac{i-1}{\max(|S|, |S^*|)/|X|}\right)$
+
+Where:
+- $S^*$: Generated target speech.
+- $\tau = \arg\min_i (t_i = |X|)$
+
+### Hallucination in Generated Tokens
+
+Hallucination in this context refers to the generation of tokens in the output $\hat{y}_i$ ​i​ that do not correspond to or align with any source token in the input. It's an important metric for evaluating the fidelity of a translation or text generation model.
+
+$H(i, h) = \mathbf{1}[{\{ (j, i) \in h \} = \emptyset}]$
+$HR(x, \hat{y}, h) = \frac{1}{|\hat{y}|} \sum\limits_{i=1}^{|\hat{y}|} H(i, h)$
+
+Where:
+-   $i$ indexes the token in the predicted sequence y^\hat{y}y^​.
+-   $h$ is a hypothetical alignment function or mapping from input tokens to output tokens.
+-   The function $H(i,h)=1$ if the token $\hat{y}_i$​ cannot be aligned to any source token, indicating it's a hallucinated token. 
+-   The sum computes the total number of hallucinated tokens to measure the proportion of the predicted output that consists of hallucinated tokens.
+
+
+### Word Error Rate (WER)
+
+Word Error Rate (WER) is a standard metric used to evaluate the performance of speech recognition systems. It quantifies the error based on the number of substitutions, insertions, and deletions that occur when comparing the transcription generated by the system to the reference (ground truth) transcription. One can also expand this to the character level (CER). 
+
+$$
+WER = \frac{\text{Substitutions} + \text{Hallucinations} + \text{Deletions}}{\text{Number of Words Spoken}}
+$$
+
+Where:
+
+-   **Substitutions**: Words in the reference that are replaced with another word by the ASR system.
+-   **Hallucinations**: Words that the ASR system adds that are not present in the reference.
+-   **Deletions**: Words that are omitted by the ASR system that are present in the reference.
+-   **Number of Words Spoken**: Total number of words in the reference transcription.
+
+
+### PN Score (Proper Noun Score)
+
+The PN Score is a novel metric designed to focus specifically on the accuracy of proper noun transcription in speech recognition. This metric evaluates the lexical similarity of proper noun phrases in the output compared to the reference, using string similarity metrics.  As an example, both Nicholas Cage and Ridiculous
+Cage would be penalized with a `WER = 0.5` given the correct
+spelling Nicolas Cage, where `Nicholas` is clearly superior.
+
+$PN\_score = \max_{n, m} \sum\limits_{k=0}^{n} \text{lex\\_dist}(\text{aligned}[k])$ 
+
+Where:
+
+-   `lex_dist` refers to the Jaro-Winkler or Levenshtein distance, which measures the similarity between two strings.
+-   `aligned[k]` refers to the k-th aligned proper noun phrase in the output and reference texts.
+-   `n, m` represent the dimensions over which the maximization is done, likely referring to different alignment possibilities or the various proper nouns considered.
+
+The PN Score aggregates the similarity scores of aligned proper nouns, maximizing over all possible alignments to capture the best possible score for each transcript, reflecting the transcription's accuracy in capturing crucial named entities for enterprise use cases.
+
+### BLEU Score
+
+BLEU is a widely-used metric for measuring the quality of machine-translated text against a set of reference translations. BLEU calculates the geometric mean of the n-gram precision scores, adjusted by a brevity penalty to discourage overly short translations. Higher BLEU scores indicate translations that are closer to their human-provided references, suggesting higher translation quality.
+
+$\text{BLEU} = \text{BP} \cdot \exp\left(\sum\limits_{n=1}^{N} w_n \log p_n\right)$ 
+
+Where
+
+-   **$BP$** (Brevity Penalty): Penalizes translations that are too short compared to their references.
+-   **$p_n$​**: Precision of n-grams between the candidate and reference texts.
+-   **$w_n$​**: Weight for each n-gram size, typically equal for all n-grams.
+-   **$N$**: Maximum order of n-grams used (commonly 4).
+
+
+### Real-time Factor (RTF)
+
+Real-time Factor (RTF) is a measure of the speed of a speech processing system. It compares the computation time to the length of the audio processed. An RTF greater than 1 means the system is slower than real-time, which might be problematic for live or streaming applications. An RTF less than 1 indicates the system can process audio faster than it is played, suitable for real-time applications.
+
+$RTF = \frac{\text{Total Computation Time}}{\text{Length of Audio}}$ 
+
+**Explanation:**
+
+-   **Total Computation Time**: The total time taken by the system to complete the processing of the audio.
+-   **Length of Audio**: The total duration of the audio input in real-time seconds. 
+
+### Hold-n Strategy
+
+The Hold-n strategy ensures that the best hypothesis is selected from the beam search of the c-th chunk, and output is delayed until a better decision can be made about the translation's correctness up to n chunks.
+
+
+$$
+\text{prefix}(W^c_{\text{best}}) = 
+\begin{cases} 
+\emptyset & \text{if } c < n, \\
+\text{LCP}(W^c_{\text{best-n+1}}, \ldots, W^c_{\text{best}}) & \text{otherwise}.
+\end{cases}
+$$
+Where:
+-   $W^c_{\text{best}}$ is the best hypothesis in the beam search of the c-th chunk.
+-   $\text{LCP}$ is the longest common prefix.
+-   $n$ is the number of chunks to hold before making a decision.
+
+### SP-n Strategy
+
+The SP-n (Shared Prefix-n) strategy generalizes the Hold-n strategy by considering the longest common prefix across all items in the beam for n consecutive chunks.
+
+
+$$
+\text{prefix}(W^c_{\text{all}}) = \begin{cases} 
+\emptyset & \text{if } c < n, \\
+\text{LCP}(W^{c-n+1}_{\text{beam 1..B}}, \ldots, W^c_{\text{beam 1..B}}) & \text{otherwise}.
+\end{cases}
+$$
+
+Where
+
+-   $W^c_{\text{all}}$​ represents all hypotheses across all beams of the c-th chunk.
+-   $B$ is the beam size.
+-   The function considers all beam hypotheses from chunk $c−n+1$ to $c$. 
+
+# Datasets
 
 ## MUST-C 
 
 | Model                     |   BLEU↑ |     AL↓ |    AP↓ |    DAL↓ |
 |:--------------------------|--------:|--------:|-------:|--------:|
-| Best IWSLT21 system       |   27.4  |  920    |   0.68 | 1420    |
+| Best IWSLT21 system       |   27.4  |  920    |   0.68 | **1420**    |
 | Best IWSLT21 system       |   29.68 | 1860    |   0.82 | 2650    |
 | Best IWSLT21 system       |   30.75 | 2740    |   0.9  | 3630    |
 | KIT IWSLT 2020            |   27.05 |  947    |   0.76 | 1993    |
@@ -63,49 +205,65 @@ Finally, the Inference part compares the real-time factor (RTF, a measure of com
 | wav2vec2 + mBART + LA-2   |   25.4  |  **727.55** |   0.73 | 1791.21 |
 | wav2vec2 + mBART + LA-2   |   30.29 | 1660.59 |   0.83 | 2662.18 |
 | wav2vec2 + mBART + LA-2   |   30.29 | 1654.77 |   0.83 | 2657.48 |
-| Wait-K (Ma et al., 2020c) |   13.95 | 1750    |   0.79 |    **1.98** |
-| CAAT(Liu et al., 2021b)   |   22.1  | 1920    |   0.86 |    2.52 |
-| Wang et al. (2022a)       |   22.13 | 2370    |   0.86 |    2.65 |
-| Liu et al. (2021a)        |   29.68 | 1860    |   0.82 |    2.65 |
-| Polák et al. (2022)       |   31.47 | 1930    |   0.86 |    2.96 |
-| R-BI                      |   31.69 | 1920    |   0.77 |    2.63 |
-| Wang et al. (2022a)       |   12.82 | 1840    |   0.94 |    3.37 |
-| Polák et al. (2022)       |   16.92 | 2460    |   0.9 |    3.22 |
-| R-BI                      |   16.28 | 1860    |   0.81 |    2.45 |
-| Wang et al. (2022a)       |   20.38 | 1750    |   0.94 |    3.34 |
-| Polák et al. (2022)       |   23.61 | 1750    |   0.85 |    2.56 |
-| Zhu et al. (2022)         |   22.49 | 1270    |   0.85 |    2.56 |
-| R-BI                      |   24.36 | 1870    |   0.92 |    2.68 |
-| gpt-3.5-turbo-0613        |    2.08 | 2574.98 |   **0.35** | 2477.55 |
-| gpt-4-0613                |   21.82 | 1998.63 |   0.94 | 2314.27 |
-| Llama-70b-hf (SFT)        |   18.41 | 1619.64 |   0.84 | 2454.72 |
-| Llama-13b-hf (SFT)        |   17.07 | 1880.76 |   0.88 | 2545.74 |
+| Wait-K (Ma et al., 2020c) |   13.95 | 1750    |   0.79 |    1980 |
+| CAAT(Liu et al., 2021b)   |   22.1  | 1920    |   0.86 |    2520 |
+| Wang et al. (2022a)       |   22.13 | 2370    |   0.86 |    2650 |
+| Liu et al. (2021a)        |   29.68 | 1860    |   0.82 |    2650 |
+| Polák et al. (2022)       |   31.47 | 1930    |   0.86 |    2960 |
+| R-BI                      |   31.69 | 1920    |   0.77 |    2630 |
+| Wang et al. (2022a)       |   12.82 | 1840    |   0.94 |    3370 |
+| Polák et al. (2022)       |   16.92 | 2460    |   0.9 |    3220 |
+| R-BI                      |   16.28 | 1860    |   0.81 |    2450 |
+| Wang et al. (2022a)       |   20.38 | 1750    |   0.94 |    3340 |
+| Polák et al. (2022)       |   23.61 | 1750    |   0.85 |    2560 |
+| Zhu et al. (2022)         |   22.49 | 1270    |   0.85 |    2560 |
+| R-BI                      |   24.36 | 1870    |   0.92 |    2680 |
 | EDATT                     |   17.01 | 1867.1  |   0.77 | 3251.38 |
 | NAIST IWSLT 2023          |   21.08 | 1397.33 |   0.9  | 3066.15 |
+| Llama-70b-hf (SFT)        |   18.41 | 1619.64 |   0.84 | 2454.72 |
+| Llama-13b-hf (SFT)        |   17.07 | 1880.76 |   0.88 | 2545.74 |
+| Transformer + RALCP (γ=0.6, beam=5)               |           21.87      |                  3040 |                   nan |                  nan |
+| Transformer + RALCP (γ=0.6, beam=10)              |             25.87    |                  4812 |                   nan |                  nan |
+| Llama2-7b-chat One Shot (γ=0.6, beam=5)             |             18.83    |                  3978 |                   nan |                  nan |
+| Llama2-7b-chat One Shot (γ=0.6, beam=10)              |             21.04    |                  7291 |                   nan |                  nan |
+| Llama2-7b-chat SFT (γ=0.6, beam=5)             |             29.09    |                  4147 |                   nan |                  nan |
+| Llama2-7b-chat SFT (γ=0.6, beam=10)              |             31.31    |                  7577 |                   nan |                  nan |
+| Llama2-7b-chat SFT+prefix (γ=0.6, beam=5)             |             29.37   |                  4278 |                   nan |                  nan |
+| Llama2-7b-chat SFT+prefix (γ=0.6, beam=10)              |             31.33    |                  7620 |                   nan |                  nan |
+| Whisper Large-v2 1.5B              |                29.1 |                  nan |                   nan |                  nan |
+| mSLAM-CTC 2B                        |                25.2 |                  nan |                   nan |                  nan |
+| MAESTRO 600M                         |                25.2 |                  nan |                   nan |                  nan |
+| USM-M                                 |                30.7 |                  nan |                   nan |                  nan |
+| Translatotron 2 + pretraining + TTS aug |                25.6 |                  nan |                   nan |                  nan |
+| AudioPaLM 8B S2ST (ours)                 |                36.2 |                  nan |                   nan |                  nan |
+| AudioPaLM-2 8B cascaded ASR + transl. (ours)|                39   |                  nan |                   nan |                  nan |
+| gpt-3.5-turbo-0613        |    2.08 | 2574.98 |   **0.35** | 2477.55 |
+| gpt-4-0613                |   21.82 | 1998.63 |   0.94 | 2314.27 |
 |:--------------------------|--------:|--------:|-------:|--------:|
-| toby (Ours)               |   **50.1** | 2352.19 |   nan  | nan |
+| toby (Ours)               |   **50.1** | 2352.19 |   _0.81  | _3470.2 |
 
 
 ## Europarl-ST
-| BLEU↑ | System            | Pre-trained Model     | Parameters   | en-es Europarl-ST (dev)   |   en-es Europarl-ST (test) | es-en Europarl-ST (dev)   |   es-en Europarl-ST (test) |
-|---:|:------------------|:----------------------|:-------------|:--------------------------|---------------------------:|:--------------------------|---------------------------:|
-|  0 | S2UT              | w/o pre-training      | Large (827M) | -                         |                       21.8 | -                         |                       18.8 |
-|  1 | wav2vec 2.0+mBART | wav2vec 2.0+mBART     | Large (827M) | 25.7                      |                       26   | 25.7                      |                       23.8 |
-|  2 | HuBERT            | HuBERT                | Base (157M)  | 20.2                      |                       19.1 | 21.1                      |                       19.2 |
-|  3 | Ours              | HuBERT+mBART          | Base (157M)  | 21.8                      |                       20.9 | 23.2                      |                       21.1 |
-|  4 | Speech2S          | Speech2S              | Base (157M)  | 25.3                      |                       25.6 | 26.8                      |                       24.4 |
-|  5 | C1 ASR→MT→TTS     | wav2vec 2.0+mBART     | Large (827M) | 28.8                      |                       29.1 | 31.5                      |                       32.4 |
-|  6 | C2 ASR→MT→TTS     | wav2vec 2.0+mBART     | Large (827M) | 33.8                      |                       30.3 | 34.2                      |                   **32.5** |
-|  7 | C3 S2UT+TTS       | S2UT                  | Base (157M)  | 32.4                      |                       29.1 | 34.8                      |                       31.7 |
-|  8 | C4 S2UT+mBART     | S2UT+mBART            | Base (157M)  | **35.6**                  |                   **31.4** | **36.9**                  |                       31.9 |
-|  9 | S2UT w/ orig-unit | HuBERT + Kmeans + CTC | nan          | 13.1                      |                       15.6 | 15.4                      |                       16.4 |
-| 10 | S2UT w/ orig-unit | HuBERT + Kmeans + CTC | nan          | 16.1                      |                       19.3 | 16.6                      |                       18.5 |
-| 11 | S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 17.8                      |                       20.4 | 18.5                      |                       20.3 |
-| 12 | S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 18.8                      |                       21.8 | 20.3                      |                       21.8 |
-| 13 | S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 18.9                      |                       22.7 | 19.9                      |                       22.7 |
-| 14 | S2UT+tf TTS       | HuBERT + Kmeans + CTC | nan          | 19.2                      |                       21.7 | 19.8                      |                       21.7 |
-| 15 | S2UT+T2U          | HuBERT + Kmeans + CTC | nan          | 19.4                      |                       21.8 | 19.7                      |                       21.8 |
-|---:|:------------------|:----------------------|:-------------|:--------------------------|---------------------------:|:--------------------------|---------------------------:|
+| System            | Pre-trained Model     | Parameters   | en-es Europarl-ST (dev) BLEU↑    |   en-es Europarl-ST (test) | es-en Europarl-ST (dev)   |   es-en Europarl-ST (test) |
+|:------------------|:----------------------|:-------------|:--------------------------|---------------------------:|:--------------------------|---------------------------:|
+| S2UT              | w/o pre-training      | Large (827M) | -                         |                       21.8 | -                         |                       18.8 |
+| wav2vec 2.0+mBART | wav2vec 2.0+mBART     | Large (827M) | 25.7                      |                       26   | 25.7                      |                       23.8 |
+| HuBERT            | HuBERT                | Base (157M)  | 20.2                      |                       19.1 | 21.1                      |                       19.2 |
+| Ours              | HuBERT+mBART          | Base (157M)  | 21.8                      |                       20.9 | 23.2                      |                       21.1 |
+| Speech2S          | Speech2S              | Base (157M)  | 25.3                      |                       25.6 | 26.8                      |                       24.4 |
+| C1 ASR→MT→TTS     | wav2vec 2.0+mBART     | Large (827M) | 28.8                      |                       29.1 | 31.5                      |                       32.4 |
+| C2 ASR→MT→TTS     | wav2vec 2.0+mBART     | Large (827M) | 33.8                      |                       30.3 | 34.2                      |                   **32.5** |
+| C3 S2UT+TTS       | S2UT                  | Base (157M)  | 32.4                      |                       29.1 | 34.8                      |                       31.7 |
+| C4 S2UT+mBART     | S2UT+mBART            | Base (157M)  | **35.6**                  |                   **31.4** | **36.9**                  |                       31.9 |
+| S2UT w/ orig-unit | HuBERT + Kmeans + CTC | nan          | 13.1                      |                       15.6 | 15.4                      |                       16.4 |
+| S2UT w/ orig-unit | HuBERT + Kmeans + CTC | nan          | 16.1                      |                       19.3 | 16.6                      |                       18.5 |
+| S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 17.8                      |                       20.4 | 18.5                      |                       20.3 |
+| S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 18.8                      |                       21.8 | 20.3                      |                       21.8 |
+| S2UT w/ norm-unit | HuBERT + Kmeans + CTC | nan          | 18.9                      |                       22.7 | 19.9                      |                       22.7 |
+| S2UT+tf TTS       | HuBERT + Kmeans + CTC | nan          | 19.2                      |                       21.7 | 19.8                      |                       21.7 |
+| S2UT+T2U          | HuBERT + Kmeans + CTC | nan          | 19.4                      |                       21.8 | 19.7                      |                       21.8 |
+|:--------------------------|--------:|--------:|-------:|--------:|--------:|--------:|
+| toby (Ours)               |   cascade | nan |   _  | _ | _ | _ |
 
 ### Naturalness
 | Method                     |   MOS↑ |   SMOS↑ |
@@ -125,7 +283,7 @@ Finally, the Inference part compares the real-time factor (RTF, a measure of com
 | Baseline (YourTTS)         |  3.36 | 3.42    |
 | VALL-E X                   |  3.54 | 4.0    | 
 | Speech2S                   |  4.1  | nan    |
-| Speech2S+DAT               |  **4.3**  | nan    |
+| Speech2S+DAT               |  4.3  | nan    |
 | UnitY               |  4.2  | nan    |
 | ASR (beam=10) + MT (beam=5) + TTS                | 3.37                 | nan |
 | S2T (beam=10) + TTS                              | 3.43                 | nan |
@@ -133,38 +291,60 @@ Finally, the Inference part compares the real-time factor (RTF, a measure of com
 | S2UT, no reduction (r = 1, w/ sc, tc)            | 3.35                 | nan |
 | S2UT stacked + CTC (r = 5, w/ sc, tc)            | 3.32                 | nan |
 | S2UT reduced + CTC (w/ sc, tc, beam=10)          | 3.41                 | nan |
+| AudioPalm                 | **4.44**                 | 3.65 |
 | Translatotron                 | 3.69                 | nan |
 | Translatotron + Transformer (r = 5, w/ sc, tc)     | 3.31                 | nan |
-| Translatotron 2                | 3.98                 | nan |
+| Translatotron 2                | 3.98                 | 3.36 |
 | Translatotron 2 + data augmentation            | 3.79                 | nan |
+|:--------------------------|--------:|--------:|
+| toby (Ours)               |   _ | _ | 
+
 
 |    | Method       |   SNR↑ |
 |---:|:-------------|------:|
 |  0 | DirectS2ST   | 46.45 |
 |  1 | TextlessS2ST | 47.22 |
 |  2 | TranSpeech   | 46.56 |
+|:------------------|--------:|
+| toby (Ours)       | _ |
 
-## Libri
-|    | Method                          |   CER↓ (%) |   WER↓ (%) |   Speaker Classification Accuracy↑ (%) |
-|---:|:--------------------------------|------:|------:|--------------------------------------:|
-|  0 | GROUND TRUTH                    |   0.8 |   2.5 |                                 100   |
-|  1 | Reconstruction with SoundStream |   0.9 |   2.6 |                                 100   |
-|  2 | AudioLM                         |   3.4 |   6.0 |                                   **92.6** |
-|  3 | GSLM unit-to-speech             |   2.9 |   6.6 |                                  nan |
-|  4 | w2v2-CTC                        |   **1.7** |   5.4 |                                  12.8 |
-|  5 | Transformer                     |   2.5 |   5.6 |                                  15   |
-|  6 | w2v2-CTC+TDN                    |   2.3 |   **5.3** |                                  17.6 |
-| 7 | w2v-large | nan | 26.17 | nan | 
-| 8 | Whisper-base | nan | 38.04 | nan |
-| 9 | StreamSpeech | nan | 24.67 | nan |  
+
+## Libri 
+| Method                          |   CER↓ (%) |   WER↓ (%) |   Speaker Classification Accuracy↑ (%) |
+|:--------------------------------|------:|------:|--------------------------------------:|
+| GROUND TRUTH                    |   0.8 |   2.5 |                                 100   |
+| Reconstruction with SoundStream |   0.9 |   2.6 |                                 100   |
+| AudioLM                         |   3.4 |   6.0 |                                   **92.6** |
+| GSLM unit-to-speech             |   2.9 |   6.6 |                                  nan |
+| w2v2-CTC                        |   **1.7** |   5.4 |                                  12.8 |
+| Transformer                     |   2.5 |   5.6 |                                  15   |
+| w2v2-CTC+TDN                    |   2.3 |   5.3 |                                  17.6 |
+| w2v-large | nan | 26.17 | nan | 
+| Whisper-base | nan | 38.04 | nan |
+| Whisper Large-v2 1.5B                |                 nan | 13.6                 |                   nan |
+| Whisper Large-v3    |   nan |   3.6 | nan |
+| StreamSpeech | nan | 24.67 | nan |  
+| AssemblyAI Universal-1     |   nan |   3.1 | nan |
+| NVIDIA Canary-1B           |   nan |   **3**   | nan |
+| Microsoft Azure Batch v3.1 |   nan |   6.4 | nan |
+| Deepgram Nova-2            |   nan |   5.7 | nan |
+| Amazon                     |   nan |   6.6 | nan |
+| Google Latest-long         |   nan |  12.6 | nan |
+| mSLAM-CTC 2B                            |                 nan | 9.1                  |                   nan |
+| MAESTRO 600M                           |                 nan | 8.1                  |                   nan |
+| AudioPaLM 8B AST                                     |                 nan | 11.1                 |                   nan |
+| AudioPaLM-2 8B AST                                   |                 nan | 9.8                  |                   nan |
+|:--------------------------|--------:|--------:|-------:|--------:|--------:|--------:|
+| toby (Ours)               |   _  | 3.6 | _ |
+
 
 ## Inference
-| model               | mode | quantization | system message | size, bn param. | RTF↑ |
+| model               | mode | quantization | system message | size, bn param. | RTF↓ |
 |---------------------|------|--------------|----------------|-----------------|-----|
 | TRANSLLAMA                | T2TT | 4-bit        | no             | 70              | 14.6 |
 | TRANSLLAMA                | T2TT | 4-bit        | yes            | 70              | 20.2 |
 | TRANSLLAMA                | S2TT | 4-bit        | no             | 70              | 15.3 |
-| TRANSLLAMA                | S2TT | 4-bit        | yes            | 70              | **23.9** |
+| TRANSLLAMA                | S2TT | 4-bit        | yes            | 70              | 23.9 |
 | GPT-4               | T2TT | nan      | yes            | nan         | 1.5 |
 | GPT-4               | S2TT | nan      | yes            | nan         | 4.8 |
 | EDATT | S2TT | 16-bit       | nan            | 1.04            | 0.7 |
@@ -176,3 +356,8 @@ Finally, the Inference part compares the real-time factor (RTF, a measure of com
 | TranSpeech (iter=15)              | S2TT   |         nan       |     nan             |              0.39 |   5.34 |
 | TranSpeech (iter=15 + b=15)       | S2TT   |        nan        |         nan         |              0.39 |   2.75 |
 | TranSpeech (iter=15 + b=15 + NPD) | S2TT   |        nan        |      nan            |              0.39 |   2.53 |
+| NVIDIA Canary | S2TT | nan | nan | 1 | 14.96 | 
+| Whisper Large v3 | S2TT | nan | no | 1.55 | 5.99 | 
+| AssemblyAI Univeral-1 | S2TT | nan | nan | .6 | **.57** | 
+|:-------|----:|----:|----:|----:|----:| 
+| toby | S2TT | _ | _ | _ | _ | 
